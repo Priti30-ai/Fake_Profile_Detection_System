@@ -22,7 +22,7 @@ function App() {
     has_external_url: ""
   });
 
-  // Handle manual input
+  // ✅ Handle manual input
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -30,7 +30,7 @@ function App() {
     });
   };
 
-  // 🔥 Username Prediction
+  // 🔥 Username Prediction (FIXED)
   const handleUsernamePredict = async () => {
     if (!username) {
       alert("Enter username");
@@ -40,36 +40,62 @@ function App() {
     setLoading(true);
     setResult("");
 
-    const response = await fetch("http://localhost:5000/predict-username", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ username })
-    });
+    try {
+      const response = await fetch("http://localhost:5000/predict-username", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username })
+      });
 
-    const data = await response.json();
-    setResult(data.prediction);
+      const data = await response.json();
+
+      // ✅ Handle backend errors
+      if (data.error) {
+        setResult("Error: " + data.error);
+      } else {
+        setResult(data.prediction);
+      }
+
+    } catch (err) {
+      console.error("Frontend Error ❌", err);
+      setResult("Server not responding");
+    }
+
     setLoading(false);
   };
 
-  // 🔥 Manual Prediction
+  // 🔥 Manual Prediction (FIXED)
   const handleManualSubmit = async (e) => {
     e.preventDefault();
 
     setLoading(true);
     setResult("");
 
-    const response = await fetch("http://localhost:5000/predict", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(formData)
-    });
+    try {
+      const response = await fetch("http://localhost:5000/predict", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+      });
 
-    const data = await response.json();
-    setResult(data.prediction);
+      const data = await response.json();
+
+      // ✅ Handle backend errors
+      if (data.error) {
+        setResult("Error: " + data.error);
+      } else {
+        setResult(data.prediction);
+      }
+
+    } catch (err) {
+      console.error("Frontend Error ❌", err);
+      setResult("Server not responding");
+    }
+
     setLoading(false);
   };
 

@@ -2,14 +2,17 @@ import sys
 import json
 import joblib
 import pandas as pd
+import os
 
-# Load model
-model = joblib.load("../ai-model/model.pkl")
+# ✅ Load model safely (absolute path)
+current_dir = os.path.dirname(__file__)
+model_path = os.path.join(current_dir, "model.pkl")
+model = joblib.load(model_path)
 
-# Get input
+# ✅ Get input
 input_data = json.loads(sys.argv[1])
 
-# Define feature order (VERY IMPORTANT)
+# ✅ Feature order (VERY IMPORTANT)
 features = [
     'edge_followed_by',
     'edge_follow',
@@ -25,11 +28,11 @@ features = [
     'has_external_url'
 ]
 
-# Convert to DataFrame in correct order
+# ✅ Convert to DataFrame
 df = pd.DataFrame([input_data])[features]
 
-# Predict
+# ✅ Predict
 prediction = model.predict(df)[0]
 
-# Print result
-print(prediction)
+# ✅ Print ONLY 0 or 1
+print(int(prediction))

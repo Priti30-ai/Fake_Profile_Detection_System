@@ -1,20 +1,30 @@
 const express = require("express");
 const { spawn } = require("child_process");
 const cors = require("cors");
-const db = require("./db"); // ✅ MySQL connection
+const path = require("path");
+
+// ⚠️ FIX THIS PATH IF NEEDED
+// const db = require("../database/db");
+const db = require("./db");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// API route
-app.post("/predict", (req, res) => {
-    const inputData = req.body;
+// ✅ Python paths
+const pythonPath = "C:\\Users\\Priti\\AppData\\Local\\Programs\\Python\\Python312\\python.exe";
+const scriptPath = path.join(__dirname, "../ai-model/predict.py");
 
-    const pythonProcess = spawn(
-        "C:\\Users\\Priti\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
-        ["../ai-model/predict.py", JSON.stringify(inputData)]
-    );
+// ==============================================
+// 🔥 COMMON FUNCTION
+// ==============================================
+const runPython = (inputData, callback) => {
+    console.log("➡️ Sending to Python:", inputData); // ✅ DEBUG
+
+    const pythonProcess = spawn(pythonPath, [
+        scriptPath,
+        JSON.stringify(inputData)
+    ]);
 
     let result = "";
     let errorOutput = "";
@@ -28,20 +38,44 @@ app.post("/predict", (req, res) => {
     });
 
     pythonProcess.on("close", (code) => {
+        console.log("🐍 Python Output:", result); // ✅ DEBUG
+        console.log("🐍 Python Error:", errorOutput); // ✅ DEBUG
 
         if (code !== 0) {
-            return res.json({
+            return callback({
                 error: "Python error",
                 details: errorOutput
             });
         }
 
-        // ✅ Convert prediction
-        const predictionResult = result.trim() === "1"
-            ? "Fake Profile"
-            : "Real Profile";
+        const cleaned = result.trim();
 
-        // ✅ Insert into MySQL
+        if (cleaned !== "0" && cleaned !== "1") {
+            return callback({
+                error: "Invalid model output",
+                raw: cleaned
+            });
+        }
+
+        const predictionResult =
+            cleaned === "1" ? "Fake Profile" : "Real Profile";
+
+        callback(null, predictionResult);
+    });
+};
+
+// ==============================================
+// 🔥 EXISTING ROUTE (ADVANCED MODE)
+// ==============================================
+app.post("/predict", (req, res) => {
+    const inputData = req.body;
+
+    runPython(inputData, (err, predictionResult) => {
+        if (err) {
+            console.error("Predict Error ❌", err);
+            return res.json(err);
+        }
+
         const query = `
             INSERT INTO predictions (
                 edge_followed_by, edge_follow, username_length, username_has_number,
@@ -70,15 +104,10 @@ app.post("/predict", (req, res) => {
         db.query(query, values, (err, dbResult) => {
             if (err) {
                 console.error("DB Insert Error ❌", err);
-
-                return res.json({
-                    error: "Database error"
-                });
+                return res.json({ error: "Database error" });
             }
-
             console.log("Data stored in MySQL ✅");
 
-            // ✅ SEND RESPONSE ONLY AFTER DB SUCCESS
             res.json({
                 prediction: predictionResult
             });
@@ -86,7 +115,53 @@ app.post("/predict", (req, res) => {
     });
 });
 
-// Start server
+// ==============================================
+// 🔥 USERNAME MODE (FIXED)
+// ==============================================
+app.post("/predict-username", (req, res) => {
+    try {
+        console.log("📩 Username request:", req.body); // ✅ DEBUG
+        const { username } = req.body;
+
+        if (!username) {
+            return res.json({ error: "Username is required" });
+        }
+
+        const inputData = {
+            edge_followed_by: 0,
+            edge_follow: 0,
+            username_length: Number(username.length),
+            username_has_number: /\d/.test(username) ? 1 : 0,
+            full_name_has_number: 0,
+            full_name_length: 0,
+            is_private: 0,
+            is_joined_recently: 0,
+            has_channel: 0,
+            is_business_account: 0,
+            has_guides: 0,
+            has_external_url: 0
+        };
+
+        runPython(inputData, (err, predictionResult) => {
+            if (err) {
+                console.error("Username Route Error ❌", err);
+                return res.json(err);
+            }
+
+            res.json({
+                prediction: predictionResult
+            });
+        });
+
+    } catch (error) {
+        console.error("Username Route Crash ❌", error);
+        res.json({ error: "Server crash" });
+    }
+});
+
+// ==============================================
+// 🚀 START SERVER
+// ==============================================
 app.listen(5000, () => {
-    console.log("Server running on port 5000");
+    console.log("Server running on port 5000 🚀");
 });
