@@ -1,6 +1,6 @@
 const mysql = require("mysql2");
 
-// ✅ Use connection pool (better than single connection)
+// ✅ Use connection pool 
 const db = mysql.createPool({
     host: "localhost",
     user: "root",
