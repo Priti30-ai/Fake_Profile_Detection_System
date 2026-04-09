@@ -1,63 +1,126 @@
+/* 🔹 GLOBAL */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: #0f172a;
+  background: #f0f2f5;
+}
+
+/* 🔹 NAVBAR */
+.navbar {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 60px;
+  background: linear-gradient(90deg, #1f1f1f, #343a40);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
   color: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  z-index: 1000;
+  box-sizing: border-box;
 }
 
+/* 🔹 LOGO */
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+/* 🔹 ADMIN BUTTON (ONLY NAVBAR) */
+.admin-btn {
+  background: #ffffff;
+  color: #333;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* 🔥 ADMIN HOVER */
+.admin-btn:hover {
+  background: #007bff;
+  color: white;
+  transform: scale(1.05);
+}
+
+/* 🔹 MAIN CONTAINER */
 .container {
-  text-align: center;
-  margin-top: 50px;
-}
-
-.card {
-  background: #1e293b;
+  max-width: 500px;
+  margin: 80px auto;
   padding: 20px;
-  border-radius: 12px;
-  width: 320px;
-  margin: auto;
-  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+  text-align: center;
 }
 
+/* 🔹 CARD */
+.card {
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* 🔹 INPUTS */
 input, select {
   width: 100%;
   padding: 10px;
   margin: 8px 0;
   border-radius: 6px;
-  border: none;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
 }
 
-button {
+/* 🔹 FORM BUTTONS ONLY (NOT ADMIN) */
+.card button {
   width: 100%;
   padding: 10px;
-  background: #3b82f6;
-  color: white;
+  margin-top: 10px;
   border: none;
   border-radius: 6px;
+  background: #007bff;
+  color: white;
+  font-weight: bold;
   cursor: pointer;
-  margin-top: 10px;
 }
 
-button:hover {
-  background: #2563eb;
+.card button:hover {
+  background: #0056b3;
 }
 
+/* 🔹 RESULT */
 .result {
   margin-top: 20px;
-  font-size: 22px;
+  font-size: 18px;
   font-weight: bold;
+}
+
+.real {
+  color: green;
 }
 
 .fake {
   color: red;
 }
 
-.real {
-  color: limegreen;
-}
+/* 🔹 RESPONSIVE */
+@media (max-width: 600px) {
+  .navbar {
+    padding: 0 15px;
+  }
 
-.switch {
-  margin-top: 10px;
-  cursor: pointer;
-  color: #38bdf8;
+  .logo {
+    font-size: 16px;
+  }
+
+  .admin-btn {
+    padding: 5px 10px;
+  }
+
+  .container {
+    margin: 40px 10px;
+  }
 }

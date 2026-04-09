@@ -3,8 +3,6 @@ const { spawn } = require("child_process");
 const cors = require("cors");
 const path = require("path");
 
-// ⚠️ FIX THIS PATH IF NEEDED
-// const db = require("../database/db");
 const db = require("./db");
 
 const app = express();
@@ -16,10 +14,28 @@ const pythonPath = "C:\\Users\\Priti\\AppData\\Local\\Programs\\Python\\Python31
 const scriptPath = path.join(__dirname, "../ai-model/predict.py");
 
 // ==============================================
-// 🔥 COMMON FUNCTION
+// 🔐 ADMIN LOGIN (NEW)
+// ==============================================
+const admin = {
+    email: "admin@gmail.com",
+    password: "1234"
+};
+
+app.post("/admin-login", (req, res) => {
+    const { email, password } = req.body;
+
+    if (email === admin.email && password === admin.password) {
+        res.json({ success: true });
+    } else {
+        res.json({ success: false });
+    }
+});
+
+// ==============================================
+// 🔥 COMMON PYTHON FUNCTION
 // ==============================================
 const runPython = (inputData, callback) => {
-    console.log("➡️ Sending to Python:", inputData); // ✅ DEBUG
+    console.log("➡️ Sending to Python:", inputData);
 
     const pythonProcess = spawn(pythonPath, [
         scriptPath,
@@ -38,8 +54,8 @@ const runPython = (inputData, callback) => {
     });
 
     pythonProcess.on("close", (code) => {
-        console.log("🐍 Python Output:", result); // ✅ DEBUG
-        console.log("🐍 Python Error:", errorOutput); // ✅ DEBUG
+        console.log("🐍 Python Output:", result);
+        console.log("🐍 Python Error:", errorOutput);
 
         if (code !== 0) {
             return callback({
@@ -65,7 +81,7 @@ const runPython = (inputData, callback) => {
 };
 
 // ==============================================
-// 🔥 EXISTING ROUTE (ADVANCED MODE)
+// 🔥 ADVANCED MODE (MANUAL INPUT)
 // ==============================================
 app.post("/predict", (req, res) => {
     const inputData = req.body;
@@ -106,7 +122,8 @@ app.post("/predict", (req, res) => {
                 console.error("DB Insert Error ❌", err);
                 return res.json({ error: "Database error" });
             }
-            console.log("Data stored in MySQL ✅");
+
+            console.log("Manual data stored in MySQL ✅");
 
             res.json({
                 prediction: predictionResult
@@ -116,11 +133,11 @@ app.post("/predict", (req, res) => {
 });
 
 // ==============================================
-// 🔥 USERNAME MODE (FIXED)
+// 🔥 USERNAME MODE (UPDATED + SAVES TO DB)
 // ==============================================
 app.post("/predict-username", (req, res) => {
     try {
-        console.log("📩 Username request:", req.body); // ✅ DEBUG
+        console.log("📩 Username request:", req.body);
         const { username } = req.body;
 
         if (!username) {
@@ -148,8 +165,43 @@ app.post("/predict-username", (req, res) => {
                 return res.json(err);
             }
 
-            res.json({
-                prediction: predictionResult
+            // ✅ SAVE TO DATABASE
+            const query = `
+                INSERT INTO predictions (
+                    edge_followed_by, edge_follow, username_length, username_has_number,
+                    full_name_has_number, full_name_length, is_private,
+                    is_joined_recently, has_channel, is_business_account,
+                    has_guides, has_external_url, prediction
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `;
+
+            const values = [
+                0,
+                0,
+                inputData.username_length,
+                inputData.username_has_number,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                predictionResult
+            ];
+
+            db.query(query, values, (err, dbResult) => {
+                if (err) {
+                    console.error("DB Insert Error (Username) ❌", err);
+                    return res.json({ error: "Database error" });
+                }
+
+                console.log("Username data stored in MySQL ✅");
+
+                res.json({
+                    prediction: predictionResult
+                });
             });
         });
 
@@ -157,6 +209,22 @@ app.post("/predict-username", (req, res) => {
         console.error("Username Route Crash ❌", error);
         res.json({ error: "Server crash" });
     }
+});
+
+// ==============================================
+// 📊 ADMIN HISTORY (NEW)
+// ==============================================
+app.get("/history", (req, res) => {
+    const query = "SELECT * FROM predictions ORDER BY id DESC";
+
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error("Fetch Error ❌", err);
+            return res.json({ error: "Database error" });
+        }
+
+        res.json(results);
+    });
 });
 
 // ==============================================

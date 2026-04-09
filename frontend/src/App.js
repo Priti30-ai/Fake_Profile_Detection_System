@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import "./App.css";
+import { useNavigate } from "react-router-dom";
 
 function App() {
+  const navigate = useNavigate();
+
   const [username, setUsername] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [result, setResult] = useState("");
@@ -30,7 +33,7 @@ function App() {
     });
   };
 
-  // 🔥 Username Prediction (FIXED)
+  // 🔥 Username Prediction
   const handleUsernamePredict = async () => {
     if (!username) {
       alert("Enter username");
@@ -51,7 +54,6 @@ function App() {
 
       const data = await response.json();
 
-      // ✅ Handle backend errors
       if (data.error) {
         setResult("Error: " + data.error);
       } else {
@@ -66,7 +68,7 @@ function App() {
     setLoading(false);
   };
 
-  // 🔥 Manual Prediction (FIXED)
+  // 🔥 Manual Prediction
   const handleManualSubmit = async (e) => {
     e.preventDefault();
 
@@ -84,7 +86,6 @@ function App() {
 
       const data = await response.json();
 
-      // ✅ Handle backend errors
       if (data.error) {
         setResult("Error: " + data.error);
       } else {
@@ -100,105 +101,121 @@ function App() {
   };
 
   return (
-    <div className="container">
-      <h1>Fake Profile Detection</h1>
+    <div>
 
-      {/* ================= USERNAME MODE ================= */}
-      {!showAdvanced && (
-        <div className="card">
-          <input
-            type="text"
-            placeholder="Enter Instagram Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
+      {/* 🔥 NAVBAR */}
+      <div className="navbar">
+        <h3>Fake Profile Detection</h3>
 
-          <button onClick={handleUsernamePredict}>
-            {loading ? "Checking..." : "Predict"}
-          </button>
+        <button
+          className="admin-btn"
+          onClick={() => navigate("/admin-login")}
+        >
+          Admin
+        </button>
+      </div>
 
-          <p className="switch" onClick={() => setShowAdvanced(true)}>
-            ⚙️ Advanced Mode
-          </p>
-        </div>
-      )}
+      {/* 🔥 MAIN UI */}
+      <div className="container">
+        <h1>Fake Profile Detection</h1>
 
-      {/* ================= ADVANCED MODE ================= */}
-      {showAdvanced && (
-        <div className="card">
-          <form onSubmit={handleManualSubmit} className="form">
+        {/* USERNAME MODE */}
+        {!showAdvanced && (
+          <div className="card">
+            <input
+              type="text"
+              placeholder="Enter Instagram Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
 
-            <input type="number" name="edge_followed_by" placeholder="Followers" onChange={handleChange} required />
-            <input type="number" name="edge_follow" placeholder="Following" onChange={handleChange} required />
-            <input type="number" name="username_length" placeholder="Username Length" onChange={handleChange} required />
-
-            <select name="username_has_number" onChange={handleChange} required>
-              <option value="">Username has number?</option>
-              <option value="1">Yes</option>
-              <option value="0">No</option>
-            </select>
-
-            <select name="full_name_has_number" onChange={handleChange} required>
-              <option value="">Full name has number?</option>
-              <option value="1">Yes</option>
-              <option value="0">No</option>
-            </select>
-
-            <input type="number" name="full_name_length" placeholder="Full Name Length" onChange={handleChange} required />
-
-            <select name="is_private" onChange={handleChange} required>
-              <option value="">Private?</option>
-              <option value="1">Yes</option>
-              <option value="0">No</option>
-            </select>
-
-            <select name="is_joined_recently" onChange={handleChange} required>
-              <option value="">Recently Joined?</option>
-              <option value="1">Yes</option>
-              <option value="0">No</option>
-            </select>
-
-            <select name="has_channel" onChange={handleChange} required>
-              <option value="">Has Channel?</option>
-              <option value="1">Yes</option>
-              <option value="0">No</option>
-            </select>
-
-            <select name="is_business_account" onChange={handleChange} required>
-              <option value="">Business?</option>
-              <option value="1">Yes</option>
-              <option value="0">No</option>
-            </select>
-
-            <select name="has_guides" onChange={handleChange} required>
-              <option value="">Has Guides?</option>
-              <option value="1">Yes</option>
-              <option value="0">No</option>
-            </select>
-
-            <select name="has_external_url" onChange={handleChange} required>
-              <option value="">External URL?</option>
-              <option value="1">Yes</option>
-              <option value="0">No</option>
-            </select>
-
-            <button type="submit">
-              {loading ? "Checking..." : "Check Profile"}
+            <button onClick={handleUsernamePredict}>
+              {loading ? "Checking..." : "Predict"}
             </button>
-          </form>
 
-          <p className="switch" onClick={() => setShowAdvanced(false)}>
-            ⬅ Back to Simple Mode
-          </p>
-        </div>
-      )}
+            <p className="switch" onClick={() => setShowAdvanced(true)}>
+              ⚙️ Advanced Mode
+            </p>
+          </div>
+        )}
 
-      {/* ================= RESULT ================= */}
-      {result && (
-        <div className={`result ${result === "Fake Profile" ? "fake" : "real"}`}>
-          {result}
-        </div>
-      )}
+        {/* ADVANCED MODE */}
+        {showAdvanced && (
+          <div className="card">
+            <form onSubmit={handleManualSubmit} className="form">
+
+              <input type="number" name="edge_followed_by" placeholder="Followers" onChange={handleChange} required />
+              <input type="number" name="edge_follow" placeholder="Following" onChange={handleChange} required />
+              <input type="number" name="username_length" placeholder="Username Length" onChange={handleChange} required />
+
+              <select name="username_has_number" onChange={handleChange} required>
+                <option value="">Username has number?</option>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+              </select>
+
+              <select name="full_name_has_number" onChange={handleChange} required>
+                <option value="">Full name has number?</option>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+              </select>
+
+              <input type="number" name="full_name_length" placeholder="Full Name Length" onChange={handleChange} required />
+
+              <select name="is_private" onChange={handleChange} required>
+                <option value="">Private?</option>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+              </select>
+
+              <select name="is_joined_recently" onChange={handleChange} required>
+                <option value="">Recently Joined?</option>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+              </select>
+
+              <select name="has_channel" onChange={handleChange} required>
+                <option value="">Has Channel?</option>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+              </select>
+
+              <select name="is_business_account" onChange={handleChange} required>
+                <option value="">Business?</option>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+              </select>
+
+              <select name="has_guides" onChange={handleChange} required>
+                <option value="">Has Guides?</option>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+              </select>
+
+              <select name="has_external_url" onChange={handleChange} required>
+                <option value="">External URL?</option>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+              </select>
+
+              <button type="submit">
+                {loading ? "Checking..." : "Check Profile"}
+              </button>
+            </form>
+
+            <p className="switch" onClick={() => setShowAdvanced(false)}>
+              ⬅ Back to Simple Mode
+            </p>
+          </div>
+        )}
+
+        {/* RESULT */}
+        {result && (
+          <div className={`result ${result === "Fake Profile" ? "fake" : "real"}`}>
+            {result}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
