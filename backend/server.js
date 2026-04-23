@@ -13,9 +13,8 @@ app.use(express.json());
 const pythonPath = "C:\\Users\\Priti\\AppData\\Local\\Programs\\Python\\Python312\\python.exe";
 const scriptPath = path.join(__dirname, "../ai-model/predict.py");
 
-// ==============================================
-// 🔐 ADMIN LOGIN (NEW)
-// ==============================================
+// 🔐 ADMIN LOGIN 
+
 const admin = {
     email: "admin@gmail.com",
     password: "1234"
@@ -31,9 +30,7 @@ app.post("/admin-login", (req, res) => {
     }
 });
 
-// ==============================================
 // 🔥 COMMON PYTHON FUNCTION
-// ==============================================
 const runPython = (inputData, callback) => {
     console.log("➡️ Sending to Python:", inputData);
 
@@ -80,9 +77,8 @@ const runPython = (inputData, callback) => {
     });
 };
 
-// ==============================================
 // 🔥 ADVANCED MODE (MANUAL INPUT)
-// ==============================================
+
 app.post("/predict", (req, res) => {
     const inputData = req.body;
 
@@ -132,9 +128,8 @@ app.post("/predict", (req, res) => {
     });
 });
 
-// ==============================================
-// 🔥 USERNAME MODE (UPDATED + SAVES TO DB)
-// ==============================================
+
+// 🔥 USERNAME MODE
 app.post("/predict-username", (req, res) => {
     try {
         console.log("📩 Username request:", req.body);
@@ -211,9 +206,8 @@ app.post("/predict-username", (req, res) => {
     }
 });
 
-// ==============================================
-// 📊 ADMIN HISTORY (NEW)
-// ==============================================
+// 📊 ADMIN HISTORY 
+
 app.get("/history", (req, res) => {
     const query = "SELECT * FROM predictions ORDER BY id DESC";
 
@@ -227,9 +221,8 @@ app.get("/history", (req, res) => {
     });
 });
 
-// ==============================================
 // 🚀 START SERVER
-// ==============================================
+
 app.listen(5000, () => {
     console.log("Server running on port 5000 🚀");
 });

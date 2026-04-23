@@ -4,7 +4,7 @@ import joblib
 import pandas as pd
 import os
 
-# ✅ Load model safely (absolute path)
+# ✅ Load model  
 current_dir = os.path.dirname(__file__)
 model_path = os.path.join(current_dir, "model.pkl")
 model = joblib.load(model_path)
@@ -12,7 +12,7 @@ model = joblib.load(model_path)
 # ✅ Get input
 input_data = json.loads(sys.argv[1])
 
-# ✅ Feature order (VERY IMPORTANT)
+# ✅ Feature order
 features = [
     'edge_followed_by',
     'edge_follow',

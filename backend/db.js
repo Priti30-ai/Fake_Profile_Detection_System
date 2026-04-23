@@ -17,7 +17,7 @@ db.getConnection((err, connection) => {
         console.error("DB Connection Failed ❌", err);
     } else {
         console.log("MySQL Connected ✅");
-        connection.release(); // very important
+        connection.release(); 
     }
 });
 
